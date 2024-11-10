@@ -13,13 +13,38 @@ class LibraryDetailView(DetailView):
     template_name = 'library_detail.html'
     context_object_name = 'library'
 
+
 def register(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)  # Log in the user immediately after registration
-            return redirect('home')  # or wherever you want to redirect after login
+            role = form.cleaned_data.get('role')
+            user_profile = UserProfile.objects.get(user=user)
+            user_profile.role = role
+            user_profile.save()
+            return redirect('login')
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm()
     return render(request, 'relationship_app/register.html', {'form': form})
+
+def is_admin(user):
+    return user.is_authenticated and hasattr(user, 'userprofile') and user.userprofile.role == 'Admin'
+
+def is_librarian(user):
+    return user.is_authenticated and hasattr(user, 'userprofile') and user.userprofile.role == 'Librarian'
+
+def is_member(user):
+    return user.is_authenticated and hasattr(user, 'userprofile') and user.userprofile.role == 'Member'
+
+@user_passes_test(is_admin)
+def admin_view(request):
+    return HttpResponse("Welcome, Admin!")
+
+@user_passes_test(is_librarian)
+def librarian_view(request):
+    return HttpResponse("Welcome, Librarian!")
+
+@user_passes_test(is_member)
+def member_view(request):
+    return HttpResponse("Welcome, Member!")
