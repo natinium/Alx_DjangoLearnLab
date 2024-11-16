@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect
-from django.views.generic import DetailView
 from .models import Book
 from .models import Library
 from .models import UserProfile
@@ -7,7 +6,7 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import user_passes_test
 from django.http import HttpResponse
 from .forms import CustomUserCreationForm
-
+from django.views.generic.detail import DetailView
 
 def list_books(request):
     books = Book.objects.all()
