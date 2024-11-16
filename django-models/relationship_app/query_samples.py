@@ -1,3 +1,6 @@
+import os
+import django
+
 from relationship_app.models import Author, Book, Library, Librarian
 
 def get_books_by_author(author_name):
@@ -19,6 +22,7 @@ def list_books_in_library(library_name):
             print(f"- {book.title} by {book.author.name}")
     except Library.DoesNotExist:
         print("Library does not exist.")
+
 
 def get_librarian_for_library(library_name):
     try:
