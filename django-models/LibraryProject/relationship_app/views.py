@@ -1,6 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic import DetailView
 from .models import Book, Library
+from django.contrib.auth.forms import UserCreationForm
 
 def list_books(request):
     books = Book.objects.all()
@@ -10,3 +11,13 @@ class LibraryDetailView(DetailView):
     model = Library
     template_name = 'library_detail.html'
     context_object_name = 'library'
+
+def register(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('login')  # Redirect to login after successful registration
+    else:
+        form = UserCreationForm()
+    return render(request, 'register.html', {'form': form})
