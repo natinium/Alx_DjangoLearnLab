@@ -5,6 +5,8 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import user_passes_test
 from django.http import HttpResponse
 from .forms import CustomUserCreationForm
+from .models import UserProfile
+
 
 def list_books(request):
     books = Book.objects.all()
@@ -30,7 +32,12 @@ def register(request):
     return render(request, 'relationship_app/register.html', {'form': form})
 
 def is_admin(user):
-    return user.is_authenticated and hasattr(user, 'userprofile') and user.userprofile.role == 'Admin'
+    if user.is_authenticated:
+        try:
+            return user.userprofile.role == 'Admin'
+        except UserProfile.DoesNotExist:
+            return False
+    return False
 
 def is_librarian(user):
     return user.is_authenticated and hasattr(user, 'userprofile') and user.userprofile.role == 'Librarian'
