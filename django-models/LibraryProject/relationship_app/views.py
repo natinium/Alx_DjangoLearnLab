@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.http import HttpResponse
 from .forms import CustomUserCreationForm
 from .models import UserProfile
-from django.core.exceptions import PermissionDenied
+
 
 def list_books(request):
     books = Book.objects.all()
@@ -31,54 +31,23 @@ def register(request):
         form = CustomUserCreationForm()
     return render(request, 'relationship_app/register.html', {'form': form})
 
-
 def is_admin(user):
-    try:
-        return user.is_authenticated and user.userprofile.role == 'Admin'
-    except AttributeError:
-        return False
+    return user.is_authenticated and hasattr(user, 'userprofile') and user.userprofile.role == 'Admin'
 
 def is_librarian(user):
-    try:
-        return user.is_authenticated and user.userprofile.role == 'Librarian'
-    except AttributeError:
-        return False
+    return user.is_authenticated and hasattr(user, 'userprofile') and user.userprofile.role == 'Librarian'
 
 def is_member(user):
-    try:
-        return user.is_authenticated and user.userprofile.role == 'Member'
-    except AttributeError:
-        return False
+    return user.is_authenticated and hasattr(user, 'userprofile') and user.userprofile.role == 'Member'
 
-@user_passes_test(is_admin, login_url='login')
+@user_passes_test(is_admin)
 def admin_view(request):
-    """
-    View for admin users only
-    """
-    context = {
-        'role': 'Admin',
-        'permissions': ['Manage Users', 'Manage Roles', 'View All Content']
-    }
-    return render(request, 'admin_dashboard.html', context)
+    return render(request, 'relationship_app/admin_view.html')
 
-@user_passes_test(is_librarian, login_url='login')
+@user_passes_test(is_librarian)
 def librarian_view(request):
-    """
-    View for librarian users only
-    """
-    context = {
-        'role': 'Librarian',
-        'permissions': ['Manage Books', 'View Members', 'Issue Books']
-    }
-    return render(request, 'librarian_dashboard.html', context)
+    return HttpResponse("Welcome, Librarian!")
 
-@user_passes_test(is_member, login_url='login')
+@user_passes_test(is_member)
 def member_view(request):
-    """
-    View for member users only
-    """
-    context = {
-        'role': 'Member',
-        'permissions': ['View Books', 'Borrow Books', 'View Profile']
-    }
-    return render(request, 'member_dashboard.html', context)
+    return HttpResponse("Welcome, Member!")
