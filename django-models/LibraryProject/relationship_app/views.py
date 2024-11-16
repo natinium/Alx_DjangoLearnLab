@@ -40,14 +40,14 @@ def is_librarian(user):
 def is_member(user):
     return user.is_authenticated and hasattr(user, 'userprofile') and user.userprofile.role == 'Member'
 
-@user_passes_test(is_admin)
+@user_passes_test(is_admin, login_url='login')
 def admin_view(request):
-    return render(request, 'relationship_app/admin_view.html')
+    return render(request, 'relationship_app/admin_page.html')
 
-@user_passes_test(is_librarian)
+@user_passes_test(is_librarian, login_url='login')
 def librarian_view(request):
-    return HttpResponse("Welcome, Librarian!")
+    return render(request, 'relationship_app/librarian_page.html')
 
-@user_passes_test(is_member)
+@user_passes_test(is_member, login_url='login')
 def member_view(request):
-    return HttpResponse("Welcome, Member!")
+    return render(request, 'relationship_app/member_page.html')
