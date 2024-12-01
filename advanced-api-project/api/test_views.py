@@ -37,7 +37,8 @@ class BookAPITests(APITestCase):
         self.assertEqual(response.data, serializer.data)
 
     def test_create_book_authenticated(self):
-        self.client.force_authenticate(user=self.user)
+        # Using self.client.login() for session-based login
+        self.client.login(username='testuser', password='testpass123')
         url = reverse('book-create')
         data = {
             'title': 'New Book',
@@ -61,7 +62,7 @@ class BookAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_update_book(self):
-        self.client.force_authenticate(user=self.user)
+        self.client.login(username='testuser', password='testpass123')
         url = reverse('book-update', kwargs={'pk': self.book1.pk})
         data = {
             'title': 'Updated Title',
@@ -75,7 +76,7 @@ class BookAPITests(APITestCase):
         self.assertEqual(self.book1.title, 'Updated Title')
 
     def test_delete_book(self):
-        self.client.force_authenticate(user=self.user)
+        self.client.login(username='testuser', password='testpass123')
         url = reverse('book-delete', kwargs={'pk': self.book1.pk})
         response = self.client.delete(url)
         
@@ -106,7 +107,7 @@ class BookAPITests(APITestCase):
         self.assertEqual(response.data[0]['title'], 'Django REST Framework')
 
     def test_invalid_publication_year(self):
-        self.client.force_authenticate(user=self.user)
+        self.client.login(username='testuser', password='testpass123')
         url = reverse('book-create')
         data = {
             'title': 'Future Book',
@@ -118,7 +119,7 @@ class BookAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_duplicate_book_title(self):
-        self.client.force_authenticate(user=self.user)
+        self.client.login(username='testuser', password='testpass123')
         url = reverse('book-create')
         data = {
             'title': 'Python Programming',
