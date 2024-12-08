@@ -1,6 +1,6 @@
 from django import forms
 from .models import Post, Comment
-from taggit.forms import TagWidget  # Import TagWidget
+from taggit.forms import TagWidget
 
 class PostForm(forms.ModelForm):
     class Meta:
@@ -9,7 +9,7 @@ class PostForm(forms.ModelForm):
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the title'}),
             'content': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Write your content here'}),
-            'tags': TagWidget(attrs={'class': 'form-control', 'placeholder': 'Add tags separated by commas'}),
+            'tags': TagWidget(),
         }
 
 class CommentForm(forms.ModelForm):
