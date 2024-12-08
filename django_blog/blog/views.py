@@ -8,9 +8,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django import forms
 from .models import Post, Comment
 from .forms import  PostForm, CommentForm
-from django.views.generic import ListView, DetailView, UpdateView
+from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView
 from django.urls import reverse_lazy
 from django.db.models import Q
+
+def home(request):
+    return render(request, 'blog/base.html')
 
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -166,11 +169,10 @@ def delete_comment(request, comment_id):
     comment.delete()
     return redirect('post_detail', post_id=comment.post.id)
 
- def post_search(request):
+def post_search(request):
     query = request.GET.get('q', '')
     posts = Post.objects.filter(
-        Q(title__icontains=query) | Q(content__icontains=query) | Q(tags__name__icontains=query)
-    ).distinct()
+        Q(title__icontains=query) | Q(content__icontains=query) | Q(tags__name__icontains=query)).distinct()
 
     return render(request, 'blog/post_search_results.html', {'posts': posts, 'query': query})
 
