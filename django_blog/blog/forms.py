@@ -3,7 +3,7 @@ from .models import Post, Comment
 from taggit.forms import TagField
 
 class PostForm(forms.ModelForm):
-    tags = TagField(required=False)
+    tags = forms.CharField(widget=TagWidget(), required=False)
 
     class Meta:
         model = Post
