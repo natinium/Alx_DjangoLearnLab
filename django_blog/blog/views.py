@@ -10,6 +10,7 @@ from .models import Post, Comment
 from .forms import  PostForm, CommentForm
 from django.views.generic import ListView, DetailView, UpdateView
 from django.urls import reverse_lazy
+from django.db.models import Q
 
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -164,3 +165,21 @@ def delete_comment(request, comment_id):
     
     comment.delete()
     return redirect('post_detail', post_id=comment.post.id)
+
+ def post_search(request):
+    query = request.GET.get('q', '')
+    posts = Post.objects.filter(
+        Q(title__icontains=query) | Q(content__icontains=query) | Q(tags__name__icontains=query)
+    ).distinct()
+
+    return render(request, 'blog/post_search_results.html', {'posts': posts, 'query': query})
+
+def posts_by_tag(request, tag_name):
+    tag = Tag.objects.get(name=tag_name)
+    posts = Post.objects.filter(tags__name=tag_name)
+    return render(request, 'blog/posts_by_tag.html', {'posts': posts, 'tag': tag})
+
+def posts_by_tag(request, tag_name):
+    tag = Tag.objects.get(name=tag_name)
+    posts = Post.objects.filter(tags__name=tag_name)
+    return render(request, 'blog/posts_by_tag.html', {'posts': posts, 'tag': tag})
