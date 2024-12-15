@@ -1,14 +1,15 @@
-from rest_framework import generics,  permissions
+from rest_framework import generics, permissions
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
-from .models import User
+from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
 from .serializers import UserSerializer
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
+
+CustomUser = get_user_model()
 
 class RegisterView(generics.CreateAPIView):
-    queryset = User.objects.all()
+    queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
 
 class LoginView(ObtainAuthToken):
@@ -21,7 +22,7 @@ class FollowUserView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, user_id):
-        user_to_follow = get_object_or_404(User, id=user_id)
+        user_to_follow = get_object_or_404(CustomUser, id=user_id)
         request.user.following.add(user_to_follow)
         return Response({'message': f'You are now following {user_to_follow.username}.'})
 
@@ -29,6 +30,6 @@ class UnfollowUserView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, user_id):
-        user_to_unfollow = get_object_or_404(User, id=user_id)
+        user_to_unfollow = get_object_or_404(CustomUser, id=user_id)
         request.user.following.remove(user_to_unfollow)
         return Response({'message': f'You have unfollowed {user_to_unfollow.username}.'})
