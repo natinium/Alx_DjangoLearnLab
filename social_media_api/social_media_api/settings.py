@@ -93,8 +93,8 @@ DATABASES = {
         'NAME': 'your_database_name',
         'USER': 'your_username',
         'PASSWORD': 'your_password',
-        'HOST': '127.0.0.1',  # Change to your PostgreSQL server's host if necessary
-        'PORT': '5432',      # Change to your PostgreSQL server's port if necessary
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
     }
 }
 
