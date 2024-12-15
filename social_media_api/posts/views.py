@@ -1,10 +1,10 @@
 from rest_framework import viewsets, permissions, generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.generics import get_object_or_404
+from django.contrib.contenttypes.models import ContentType
 from .models import Post, Comment, Like
 from .serializers import PostSerializer, CommentSerializer
-from django.shortcuts import get_object_or_404
-from .models import Post, Like
 from notifications.models import Notification
 
 
@@ -16,6 +16,7 @@ class PostViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
+
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
@@ -24,6 +25,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
+
 @api_view(['GET'])
 def user_feed(request):
     following_users = request.user.following.all()
@@ -31,15 +33,15 @@ def user_feed(request):
     serializer = PostSerializer(posts, many=True)
     return Response(serializer.data)
 
+
 class LikePostView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, post_id):
-        post = get_object_or_404(Post, id=post_id)
+        post = get_object_or_404(Post, pk=post_id)
         like, created = Like.objects.get_or_create(user=request.user, post=post)
 
         if created:
-            # Create a notification for the post author
             Notification.objects.create(
                 recipient=post.author,
                 actor=request.user,
@@ -50,10 +52,11 @@ class LikePostView(generics.GenericAPIView):
             return Response({'message': 'Post liked.'})
         return Response({'message': 'You already liked this post.'})
 
+
 class UnlikePostView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, post_id):
-        post = get_object_or_404(Post, id=post_id)
+        post = get_object_or_404(Post, pk=post_id)
         Like.objects.filter(user=request.user, post=post).delete()
         return Response({'message': 'Post unliked.'})
